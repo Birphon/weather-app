@@ -126,6 +126,6 @@ const form = document.getElementById("weather-form");
 form.addEventListener("submit", (event) => {
 	event.preventDefault();
 	const location = document.getElementById("location").value;
-	const unit = document.getElementById("unit").value;
+	// const unit = document.getElementById("unit").value;
 	weatherData.getWeatherData(location, unit);
 });
