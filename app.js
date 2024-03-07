@@ -52,6 +52,7 @@ const weatherData = (() => {
 	let observers = [];
 	let apiKey = "1e43c5a5a2be7f03b0d88bf044b1cc1b";
 	let lang = "en";
+	let unit = "";
 
 	function subscribe(observer) {
 		observers.push(observer);
