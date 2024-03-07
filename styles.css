@@ -1,28 +1,51 @@
+:root {
+    --bg-color: #f5f5f5;
+    --text-color: #333;
+    --container-bg-color: #fff;
+    --container-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode {
+    --bg-color: #333;
+    --text-color: #f5f5f5;
+    --container-bg-color: #444;
+    --container-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--container-bg-color);
+    box-shadow: var(--container-shadow);
     border-radius: 5px;
 }
 
 header {
     text-align: center;
     margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 header h1 {
     font-size: 2.5rem;
-    color: #333;
     margin-bottom: 10px;
+}
+
+.dark-mode-toggle {
+    font-size: 1.2rem;
+    cursor: pointer;
 }
 
 form {
@@ -60,13 +83,13 @@ button[type="submit"]:hover {
 
 #weather-info h2 {
     font-size: 2rem;
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 10px;
 }
 
 #weather-info p {
     font-size: 1.2rem;
-    color: #555;
+    color: var(--text-color);
     margin: 5px 0;
 }
 

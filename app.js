@@ -1,8 +1,9 @@
+const apiKey = "1e43c5a5a2be7f03b0d88bf044b1cc1b";
+const lang = "en";
+const unit = "metric";
+
 const weatherData = (() => {
 	let observers = [];
-	let apiKey = "1e43c5a5a2be7f03b0d88bf044b1cc1b";
-	let lang = "en";
-	let unit = "metric";
 
 	function subscribe(observer) {
 		observers.push(observer);
@@ -17,12 +18,25 @@ const weatherData = (() => {
 	}
 
 	function getWeatherData(location) {
-		// API call to fetch weather data
+		// Geocoding API call to get latitude and longitude
 		fetch(
-			`https://api.openweathermap.org/data/2.5/weather?q=${location}&units=${unit}&appid=${apiKey}&lang=${lang}`
+			`https://api.openweathermap.org/geo/1.0/direct?q=${location}&limit=1&appid=${apiKey}`
 		)
 			.then((response) => response.json())
-			.then((data) => notifyObservers(data))
+			.then((data) => {
+				if (data.length > 0) {
+					const { lat, lon } = data[0];
+					// 5-Day Weather Forecast API call
+					fetch(
+						`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${unit}&appid=${apiKey}&lang=${lang}`
+					)
+						.then((response) => response.json())
+						.then((data) => notifyObservers(data))
+						.catch((error) => console.error(error));
+				} else {
+					console.error("Location not found");
+				}
+			})
 			.catch((error) => console.error(error));
 	}
 
@@ -33,32 +47,37 @@ const weatherData = (() => {
 	};
 })();
 
-// Weather UI Module (Observer)
 const weatherUI = (() => {
 	const weatherInfo = document.getElementById("weather-info");
 
 	function displayWeatherData(data) {
-		if (
-			data.name &&
-			data.weather &&
-			data.weather[0] &&
-			data.main &&
-			data.wind
-		) {
-			const { name, weather, main, wind } = data;
-			const { country } = data.sys || {}; // Safely access country property
-			const { description } = weather[0];
-			const { temp } = main;
-			const { speed } = wind;
+		if (data.city && data.list) {
+			const { name, country } = data.city;
+			const forecast = data.list.map((item) => {
+				const { dt_txt, weather, main, wind } = item;
+				const { description } = weather[0];
+				const { temp } = main;
+				const { speed } = wind;
+
+				return `
+                    <div class="forecast-item">
+                        <h3>${dt_txt}</h3>
+                        <p>Temperature: ${temp} °C (${(
+					(temp * 9) / 5 +
+					32
+				).toFixed(2)} °F)</p>
+                        <p>Description: ${description}</p>
+                        <p>Wind Speed: ${speed} m/s</p>
+                    </div>
+                `;
+			});
 
 			weatherInfo.innerHTML = `
-            <h2>${name}${country ? `, ${country}` : ""}</h2>
-            <p>Temperature: ${temp} °C (${((temp * 9) / 5 + 32).toFixed(
-				2
-			)} °F)</p>
-            <p>Description: ${description}</p>
-            <p>Wind Speed: ${speed} m/s</p>
-          `;
+                <h2>${name}, ${country}</h2>
+                <div class="forecast">
+                    ${forecast.join("")}
+                </div>
+            `;
 		} else {
 			weatherInfo.innerHTML = "Error: Could not retrieve weather data.";
 		}
@@ -71,11 +90,17 @@ const weatherUI = (() => {
 	};
 })();
 
-// Event Listeners
 const form = document.getElementById("weather-form");
 form.addEventListener("submit", (event) => {
 	event.preventDefault();
 	const location = document.getElementById("location").value;
-	console.log(location);
 	weatherData.getWeatherData(location);
+});
+
+// Dark Mode Toggle
+const darkModeToggle = document.querySelector(".dark-mode-toggle");
+const body = document.querySelector("body");
+
+darkModeToggle.addEventListener("click", () => {
+	body.classList.toggle("dark-mode");
 });
