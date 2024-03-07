@@ -128,6 +128,17 @@ form.addEventListener("submit", (event) => {
 	const location = document.getElementById("location").value;
 	console.log(location);
 	// const unit = document.getElementById("unit").value;
-	console.log(unit);
+	try {
+		console.log(unit); // Will throw an error if unit is not defined
+	} catch (error) {
+		// Check if the error is specifically about "unit" being undefined
+		if (error instanceof ReferenceError && error.message.includes("unit")) {
+			// Ignore the error and continue running the program
+			console.log("Unit not defined, ignoring...");
+		} else {
+			// Rethrow any other error
+			throw error;
+		}
+	}
 	weatherData.getWeatherData(location);
 });
